@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تحدي الدوال الحقيقية</title>
+<style>
+:root{
+  --blue:#2563eb;--purple:#7c3aed;--green:#16a34a;--red:#dc2626;
+  --orange:#ea580c;--ink:#1e293b;--muted:#64748b;--white:#fff;
+  --bg-color:#f1f5f9;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+body{
+  margin:0;min-height:100vh;font-family:'Segoe UI', Tahoma, Arial, sans-serif;
+  color:var(--ink);background:linear-gradient(135deg,#e0e7ff,#f3e8ff 48%,#ffedd5);
+  display:flex; justify-content:center; align-items:flex-start;
+}
+.app{width:100%; max-width:480px; margin:0 auto; padding:15px; padding-bottom: 40px;}
+.card{
+  background:rgba(255,255,255,0.98); border-radius:24px; padding:24px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5);
+}
+header{text-align:center;margin-bottom:15px}
+h1{margin:0;font-size:clamp(1.8rem,8vw,2.5rem);color:var(--purple); font-weight:900;}
+h2{margin:10px 0 15px;font-size:1.3rem; color:var(--ink);}
+p{line-height:1.7; font-size:1.05rem;}
+.hidden{display:none!important}
+button{
+  width:100%; border:0; border-radius:16px; padding:16px 14px; margin:8px 0;
+  font:inherit; font-weight:bold; font-size:1.1rem; color:#fff;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  cursor:pointer; transition:all 0.2s; box-shadow:0 4px 15px rgba(124,58,237,0.3);
+}
+button:active{transform:translateY(2px); box-shadow:0 2px 8px rgba(124,58,237,0.3);}
+button:disabled{cursor:default;opacity:0.85;transform:none;}
+.secondary{background:linear-gradient(135deg,#0f766e,#16a34a); box-shadow:0 4px 15px rgba(22,163,74,0.3);}
+.light{color:var(--ink);background:#e2e8f0;box-shadow:none;}
+.levels{display:grid;gap:12px}
+.level{padding:20px;border-radius:20px;text-align:right;color:#fff;}
+.level strong{display:block;font-size:1.3rem;margin-bottom:5px;}
+.l1{background:linear-gradient(135deg,#3b82f6,#06b6d4);}
+.l2{background:linear-gradient(135deg,#8b5cf6,#d946ef);}
+.l3{background:linear-gradient(135deg,#f97316,#eab308);}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-weight:bold; margin-bottom:15px;}
+.badge{background:#ede9fe;border-radius:12px;padding:8px 12px;color:var(--purple); font-size:1.1rem;}
+.progress-wrap{margin:15px 0;}
+.progress-label{display:flex;justify-content:space-between;font-size:0.9rem;color:var(--muted); margin-bottom:6px;}
+.progress{height:12px;background:#e2e8f0;border-radius:10px;overflow:hidden;}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--blue));transition:width 0.4s ease;}
+.question-number{color:var(--orange);font-weight:bold;font-size:1.1rem;}
+.question{font-size:1.2rem;font-weight:bold;line-height:1.7;margin:10px 0 20px; color:#0f172a;}
+.answers{display:grid;gap:10px}
+.answers button{
+  margin:0; background:#f8fafc; color:var(--ink); border:2px solid #cbd5e1;
+  box-shadow:none; text-align:right; font-size:1.05rem; transition: background 0.2s;
+}
+.answers button:active{background:#f1f5f9;}
+.answers button.correct{background:#dcfce7;border-color:var(--green);color:#166534;}
+.answers button.wrong{background:#fee2e2;border-color:var(--red);color:#991b1b;}
+.feedback{
+  text-align:right; margin:15px 0; padding:15px; border-radius:16px; 
+  font-size:1.05rem; line-height:1.6; border: 1px solid transparent;
+}
+.feedback.ok{background:#f0fdf4; color:#166534; border-color:#bbf7d0;}
+.feedback.no{background:#fef2f2; color:#991b1b; border-color:#fecaca;}
+.feedback .result-title { font-weight:bold; font-size:1.1rem; margin-bottom:8px; display:block; text-align:center; }
+.feedback .explanation { margin-top: 10px; padding-top:10px; border-top: 1px dashed rgba(0,0,0,0.1); font-size:1rem;}
+.result{text-align:center}
+.score{font-size:2.8rem;color:var(--purple);font-weight:900; margin: 15px 0;}
+.stars{font-size:2.5rem;letter-spacing:5px; margin-bottom:10px;}
+footer{text-align:center;color:var(--muted);font-weight:bold;padding:20px 0; font-size:0.9rem;}
+@media(max-width:380px){
+  .card{padding:18px;} .question{font-size:1.1rem;} button{font-size:1rem; padding:14px;}
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <h1>🎯 تحدي الدوال</h1>
+    <p style="color:var(--muted); margin-top:5px; font-weight:bold;">للصف الثاني الثانوي - القسم العلمي</p>
+  </header>
+
+  <section id="home" class="card">
+    <h2>🌟 مرحبًا بك يا بطل الرياضيات!</h2>
+    <p>اختبر مهاراتك في موضوع <strong>الدوال الحقيقية</strong> عبر ثلاثة مستويات متدرجة، واجمع أكبر عدد من النقاط.</p>
+    <button id="startBtn">🚀 ابدأ التحدي الآن</button>
+  </section>
+
+  <section id="levels" class="card hidden">
+    <h2>🧭 اختر المستوى</h2>
+    <div class="levels">
+      <button class="level l1" data-level="0">
+        <strong>المستوى الأول 🟦</strong>
+        صح أو خطأ — ١٠ أسئلة
+      </button>
+      <button class="level l2" data-level="1">
+        <strong>المستوى الثاني 🟪</strong>
+        اختيار من متعدد — ١٠ أسئلة
+      </button>
+      <button class="level l3" data-level="2">
+        <strong>المستوى الثالث 🟧</strong>
+        أسئلة متنوعة — ١٠ أسئلة
+      </button>
+    </div>
+    <button class="light" id="backHome" style="margin-top:15px;">↩ العودة للرئيسية</button>
+  </section>
+
+  <section id="game" class="card hidden">
+    <div class="topbar">
+      <span id="levelName">المستوى</span>
+      <span class="badge" id="score">النقاط: ٠</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="counter">السؤال ١ / ١٠</span>
+        <span id="percent">٠٪</span>
+      </div>
+      <div class="progress"><span id="progressBar"></span></div>
+    </div>
+    <div class="question-number" id="questionNumber"></div>
+    <div class="question" id="questionText"></div>
+    <div class="answers" id="answers"></div>
+    <div id="feedback" class="feedback hidden"></div>
+    <button id="nextBtn" class="secondary hidden">التالي ➡️</button>
+    <button id="quitBtn" class="light" style="margin-top:15px;">☰ الخروج لقائمة المستويات</button>
+  </section>
+
+  <section id="result" class="card result hidden">
+    <div class="stars" id="stars">⭐</div>
+    <h2>🏆 اكتمل التحدي!</h2>
+    <p id="resultMessage" style="font-weight:bold;"></p>
+    <div class="score" id="finalScore"></div>
+    <p id="finalPercent" style="color:var(--muted); font-size:1.1rem;"></p>
+    <button id="againBtn">🔁 إعادة المحاولة</button>
+    <button id="chooseBtn" class="secondary">🧭 مستويات أخرى</button>
+  </section>
+
+  <footer>إعداد الأستاذ: غازي عريقي</footer>
+</main>
+
+<script>
+const levels=[
+[
+{q:"مجموعة تعريف الدالة د(س) = (س² + ٥) / ٧ هي ح.",a:"صح",opts:["صح","خطأ"],exp:"لأن الدالة كسرية ومقامها عدد ثابت (٧) لا يساوي صفراً أبداً، فلا توجد قيم مستبعدة، والمجال هو ح."},
+{q:"الدالة د(س) = ٣ / (س - ٢) يتقاطع منحناها مع محور الصادات عند النقطة (٠ ، -١٫٥).",a:"صح",opts:["صح","خطأ"],exp:"لإيجاد التقاطع مع محور الصادات نضع س = ٠. إذن د(٠) = ٣ / (٠ - ٢) = -١.٥."},
+{q:"مدى الدالة د(س) = -√(س) هو الفترة (-∞ ، ٠].",a:"صح",opts:["صح","خطأ"],exp:"الجذر التربيعي يعطي قيماً موجبة أو صفراً دائماً، وبما أنه مضروب في إشارة سالبة، فإن جميع النواتج ستكون سالبة أو صفراً."},
+{q:"إذا كان مجال الدالة د هو ح+ ومجال الدالة ق هو ح، فإن مجال الدالة (د + ق)(س) هو ح+.",a:"صح",opts:["صح","خطأ"],exp:"مجال مجموع دالتين هو تقاطع مجاليهما. تقاطع (ح+) مع (ح) يعطي (ح+)."},
+{q:"قيمة |-٧| + [٢٫٣] تساوي ٩.",a:"صح",opts:["صح","خطأ"],exp:"القيمة المطلقة لـ (-٧) هي ٧. ودالة أكبر عدد صحيح لـ (٢.٣) هي ٢. إذن ٧ + ٢ = ٩."},
+{q:"مجموعة حل المعادلة [س + ٢] = ٥٫٥ هي فاي، أي المجموعة الخالية.",a:"صح",opts:["صح","خطأ"],exp:"دالة الصحيح [...] ناتجها يجب أن يكون دائماً عدداً صحيحاً، ولا يمكن أن تساوي عدداً كسرياً مثل ٥.٥."},
+{q:"الدالة د(س) = |س| قابلة لإعادة التعريف كدالة متعددة القواعد عند س = ٠.",a:"صح",opts:["صح","خطأ"],exp:"يمكن إعادة تعريف دالة المقياس عند أصفارها (هنا س=٠)، لتصبح د(س)=س عندما س≥٠، ود(س)=-س عندما س<٠."},
+{q:"إذا كانت الدالة د زوجية وفردية في آن واحد فإن د(س) = ٠.",a:"صح",opts:["صح","خطأ"],exp:"الدالة الوحيدة التي تحقق شروط الدالة الزوجية والفردية معاً هي الدالة الصفرية د(س) = ٠."},
+{q:"الدالة د(س) = ظا س هي دالة محدودة على مجالها.",a:"خطأ",opts:["صح","خطأ"],exp:"دالة الظل (ظا س) غير محدودة، لأن مداها يمتد من سالب ما لا نهاية إلى موجب ما لا نهاية (ح)."},
+{q:"الدالة د(س) = ٤ - س تكون تزايدية على كامل مجالها ح.",a:"خطأ",opts:["صح","خطأ"],exp:"الدالة خطية ومعامل س فيها سالب (-١)، وبالتالي هي دالة تناقصية وليست تزايدية."}
+],
+[
+{q:"مجموعة تعريف الدالة د(س) = ١ / (س² + ٤) هي:",a:"أ",opts:["أ) ح","ب) ح - {-٢ ، ٢}","جـ) ح - {٤}","د) [٢ ، ∞+)"],exp:"الدالة كسرية، ومقامها (س² + ٤) مجموع مربعين لا يمكن أن يساوي صفراً في الأعداد الحقيقية، لذلك مجالها هو ح."},
+{q:"مدى الدالة د(س) = ٤ - س² هو الفترة:",a:"ب",opts:["أ) [٤ ، ∞+)","ب) (-∞ ، ٤]","جـ) [٠ ، ٤]","د) ح"],exp:"الدالة تربيعية، معامل س² سالب فالمنحنى مفتوح لأسفل. أعلى نقطة لها هي عند س=٠ وقيمتها ٤، إذن المدى من سالب ما لا نهاية إلى ٤."},
+{q:"إذا كانت د(س) = √(س - ٣) فإن مجموعة التعريف هي:",a:"ب",opts:["أ) (٣ ، ∞+)","ب) [٣ ، ∞+)","جـ) ح - {٣}","د) (-∞ ، ٣]"],exp:"يجب أن يكون ما تحت الجذر التربيعي أكبر من أو يساوي صفراً. إذن: س - ٣ ≥ ٠، ومنه س ≥ ٣."},
+{q:"إذا كانت د(س) = س + ٣، ق(س) = س - ٣، فإن دالة التركيب (د ∘ ق)(س) تساوي:",a:"أ",opts:["أ) س","ب) س² - ٩","جـ) س + ٦","د) س - ٦"],exp:"(د ∘ ق)(س) تعني د(ق(س)). نعوض ق(س) داخل د: (س - ٣) + ٣ = س."},
+{q:"الدالة العكسية للدالة د(س) = (٢س + ١) / ٣ هي:",a:"أ",opts:["أ) (٣س - ١) / ٢","ب) (٣س + ١) / ٢","جـ) ٣ / (٢س + ١)","د) ٣س - ٢"],exp:"نضع ص = (٢س + ١) / ٣، نضرب الطرفين في ٣: ٣ص = ٢س + ١. ننقل ١: ٢س = ٣ص - ١. نقسم على ٢: س = (٣ص - ١) / ٢."},
+{q:"مجموعة تعريف الدالة د(س) = (س - ١) / (س² - س) هي:",a:"أ",opts:["أ) ح - {٠ ، ١}","ب) ح - {١}","جـ) ح - {٠}","د) ح"],exp:"نبحث عن أصفار المقام: س² - س = ٠. بأخذ س عامل مشترك: س(س - ١) = ٠. إذن س = ٠ أو س = ١. المجال ح ما عدا الأصفار."},
+{q:"إذا كانت د(س) = س³ دالة تقابل، فإن دالتها العكسية د⁻¹(س) هي:",a:"أ",opts:["أ) ∛(س)","ب) س²","جـ) ١ / س³","د) -س³"],exp:"نضع ص = س³. لإيجاد الدالة العكسية نأخذ الجذر التكعيبي للطرفين، فتصبح س = ∛ص."},
+{q:"مدى الدالة د(س) = |س| + ٣ هو:",a:"أ",opts:["أ) [٣ ، ∞+)","ب) ح","جـ) [٠ ، ٣]","د) (٣ ، ∞+)"],exp:"أصغر قيمة لدالة القيمة المطلقة |س| هي صفر. إذن أصغر قيمة للدالة ككل هي ٠ + ٣ = ٣، وتمتد للمالانهاية الموجبة."},
+{q:"مجموعة تعريف الدالة د(س) = ٧ / √(س² - ٩) هي:",a:"جـ",opts:["أ) [-٣ ، ٣]","ب) ح - [-٣ ، ٣]","جـ) ح - (-٣ ، ٣)","د) ح - {-٣ ، ٣}"],exp:"ما تحت الجذر في المقام يجب أن يكون أكبر تماماً من الصفر (س² - ٩ > ٠). بحل المتباينة نجد أن القيم المقبولة هي ح - [-٣ ، ٣]."},
+{q:"إذا كانت د(س) = ٢س، ق(س) = ٣س، فإن قيمة (د ∘ ق)(١) تساوي:",a:"أ",opts:["أ) ٦","ب) ٥","جـ) ٢","د) ٣"],exp:"نحسب أولاً ق(١) = ٣(١) = ٣. ثم نعوض الناتج في د: د(٣) = ٢(٣) = ٦."}
+],
+[
+{q:"الدالة د(س) = √(س) + ٢ يكون مداها:",a:"أ",opts:["أ) [٢ ، ∞+)","ب) [٠ ، ∞+)","جـ) ح","د) [٠ ، ٢]"],exp:"أصغر قيمة لـ √(س) هي صفر. إذن أصغر قيمة للدالة هي ٠ + ٢ = ٢، وتتزايد للمالانهاية."},
+{q:"مجموعة حل المعادلة |س - ١| = ٣ هي:",a:"ب",opts:["أ) {٤}","ب) {٤ ، -٢}","جـ) {-٤ ، ٢}","د) {٢}"],exp:"إما س - ١ = ٣ ومنه س = ٤. أو س - ١ = -٣ ومنه س = -٢. مجموعة الحل {٤ ، -٢}."},
+{q:"قيمة الصحيح [-٢٫١] تساوي:",a:"ب",opts:["أ) -٢","ب) -٣","جـ) -٢٫١","د) ٣"],exp:"دالة الصحيح تعطي أكبر عدد صحيح أقل من أو يساوي العدد. العدد الصحيح الذي يقع مباشرة يسار -٢.١ على خط الأعداد هو -٣."},
+{q:"طول درجة دالة الصحيح د(س) = [٠٫٥س - ٣] يساوي:",a:"أ",opts:["أ) ٢","ب) ٠٫٥","جـ) ٣","د) ٤"],exp:"طول الدرجة = ١ / |معامل س|. إذن ١ / ٠.٥ = ٢."},
+{q:"إعادة تعريف الدالة د(س) = |س + ٤| لجميع قيم س < -٤ هي:",a:"ب",opts:["أ) س + ٤","ب) -س - ٤","جـ) س - ٤","د) -س + ٤"],exp:"عندما س < -٤، يكون المقدار داخل المقياس سالباً. ولإعادة تعريفه نضربه في إشارة سالبة: -(س + ٤) = -س - ٤."},
+{q:"حل المعادلة |س| + س = ٠ يكون لكل س تنتمي لـ:",a:"ب",opts:["أ) ح+","ب) (-∞ ، ٠]","جـ) ح","د) {٠}"],exp:"المعادلة تعني أن |س| = -س. وهذا التعريف يتحقق فقط عندما تكون الأعداد سالبة أو صفراً، أي الفترة (-∞ ، ٠]."},
+{q:"مجموعة حل المعادلة [٢س] = ٤ هي الفترة:",a:"ب",opts:["أ) [٢ ، ٣)","ب) [٢ ، ٢٫٥)","جـ) [٢ ، ٤)","د) {٢}"],exp:"من تعريف الصحيح: ٤ ≤ ٢س < ٥. بالقسمة على ٢ نجد: ٢ ≤ س < ٢.٥."},
+{q:"دالة الصحيح د(س) = [س] تعتبر دالة:",a:"جـ",opts:["أ) زوجية","ب) فردية","جـ) درجية","د) دورية"],exp:"رسم دالة أكبر عدد صحيح يشبه السلالم (الدرج)، ولذلك تسمى بالدالة الدرجية."},
+{q:"أي من الدوال التالية تعتبر دالة زوجية؟",a:"أ",opts:["أ) د(س) = س⁴ + س²","ب) د(س) = س³ + س","جـ) د(س) = س + جتا س","د) د(س) = س جا س + س"],exp:"الدالة د(س) = س⁴ + س² زوجية لأن جميع أسس المتغير س فيها زوجية، ود(-س) = د(س)."},
+{q:"الدالة د(س) = جتا س دالة زوجية متماثلة حول:",a:"ب",opts:["أ) محور السينات","ب) محور الصادات","جـ) نقطة الأصل","د) المستقيم ص = س"],exp:"من خصائص الدوال الزوجية بشكل عام (ومنها دالة جيب التمام جتا) أن منحناها يكون متماثلاً حول محور الصادات."}
+]
+];
+
+const names=["المستوى الأول","المستوى الثاني","المستوى الثالث"];
+let levelIndex=0,questionIndex=0,score=0,answered=false;
+
+const $=id=>document.getElementById(id);
+const sections=["home","levels","game","result"];
+function show(id){sections.forEach(x=>$(x).classList.toggle("hidden",x!==id));}
+function arabic(n){return String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);}
+
+$("startBtn").onclick=()=>show("levels");
+$("backHome").onclick=()=>show("home");
+$("quitBtn").onclick=()=>show("levels");
+$("chooseBtn").onclick=()=>show("levels");
+$("againBtn").onclick=()=>startLevel(levelIndex);
+
+document.querySelectorAll(".level").forEach(btn=>{
+  btn.onclick=()=>startLevel(Number(btn.dataset.level));
+});
+
+function startLevel(index){
+  levelIndex=index;questionIndex=0;score=0;show("game");renderQuestion();
+}
+function renderQuestion(){
+  const item=levels[levelIndex][questionIndex];
+  answered=false;
+  $("levelName").textContent=names[levelIndex];
+  $("questionNumber").textContent=`السؤال ${arabic(questionIndex+1)}`;
+  $("counter").textContent=`السؤال ${arabic(questionIndex+1)} / ${arabic(levels[levelIndex].length)}`;
+  const percent=Math.round(questionIndex/levels[levelIndex].length*100);
+  $("percent").textContent=`${arabic(percent)}٪`;
+  $("progressBar").style.width=percent+"%";
+  $("score").textContent=`النقاط: ${arabic(score)}`;
+  $("questionText").textContent=item.q;
+  
+  const feedback = $("feedback");
+  feedback.classList.add("hidden");
+  feedback.className = "feedback";
+  $("nextBtn").classList.add("hidden");
+  
+  const box=$("answers");box.innerHTML="";
+  item.opts.forEach(option=>{
+    const b=document.createElement("button");
+    b.textContent=option;
+    b.onclick=()=>checkAnswer(b,option,item.a,item.exp);
+    box.appendChild(b);
+  });
+}
+
+function checkAnswer(button,choice,correct,explanation){
+  if(answered)return;
+  answered=true;
+  const buttons=[...$("answers").children];
+  buttons.forEach(b=>b.disabled=true);
+  
+  // إصلاح الخطأ البرمجي: التحقق إذا كانت الإجابة تطابق الحرف الأول أو النص كامل
+  const isCorrect = choice === correct || choice.startsWith(correct + ")");
+  
+  if(isCorrect){
+    score++;
+    button.classList.add("correct");
+  }else{
+    button.classList.add("wrong");
+    buttons.forEach(b=>{
+      if(b.textContent === correct || b.textContent.startsWith(correct + ")")) {
+        b.classList.add("correct");
+      }
+    });
+  }
+  
+  const feedback=$("feedback");
+  feedback.classList.remove("hidden");
+  feedback.className="feedback "+(isCorrect?"ok":"no");
+  
+  let fbHTML = `<span class="result-title">${isCorrect ? "✅ إجابة رائعة!" : "❌ إجابة خاطئة!"}</span>`;
+  if(!isCorrect){
+    let correctText = buttons.find(b=> b.classList.contains("correct")).textContent;
+    fbHTML += `الصحيح هو: <strong>${correctText}</strong><br>`;
+  }
+  fbHTML += `<div class="explanation">💡 <strong>توضيح:</strong> ${explanation}</div>`;
+  feedback.innerHTML = fbHTML;
+
+  $("score").textContent=`النقاط: ${arabic(score)}`;
+  $("nextBtn").textContent=questionIndex===levels[levelIndex].length-1?"🏆 عرض النتيجة":"التالي ➡️";
+  $("nextBtn").classList.remove("hidden");
+}
+
+$("nextBtn").onclick=()=>{
+  if(questionIndex<levels[levelIndex].length-1){questionIndex++;renderQuestion();}
+  else showResult();
+};
+
+function showResult(){
+  show("result");
+  const total=levels[levelIndex].length;
+  const percent=Math.round(score/total*100);
+  $("finalScore").textContent=`${arabic(score)} / ${arabic(total)}`;
+  $("finalPercent").textContent=`نسبة الإنجاز: ${arabic(percent)}٪`;
+  $("stars").textContent=percent>=80?"🌟🏆🌟":percent>=50?"⭐👏⭐":"💪⭐💪";
+  $("resultMessage").textContent=percent>=80
+    ?"ممتاز جدًا! لقد أبدعت 🎉"
+    :percent>=50
+    ?"أداء جميل! راجع التوضيحات وحاول مجدداً 😊"
+    :"لا تستسلم! التدريب المستمر يقودك للتفوق 💪";
+}
+</script>
+</body>
+</html><html>
+
+</html>
